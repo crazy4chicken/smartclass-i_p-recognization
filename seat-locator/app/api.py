@@ -7,7 +7,9 @@ x-teamusers-permission；失败统一 RFC 9457 problem details。
 """
 from __future__ import annotations
 
+import asyncio
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -94,6 +96,7 @@ def create_app(
     allow_private_image_hosts: bool = False,
     face_backend_url: str = "",
     face_backend_timeout: float = 10.0,
+    detect_workers: int = 2,
 ) -> FastAPI:
     """组装 FastAPI 应用。测试通过 detector/face_client/fetch_client 注入桩。"""
 
@@ -112,6 +115,20 @@ def create_app(
         app.state.image_max_bytes = image_max_bytes
         app.state.image_max_pixels = image_max_pixels
         app.state.allow_private_image_hosts = allow_private_image_hosts
+        # CPU 推理线程池：torch/numpy 在 C 层释放 GIL，
+        # 有界池防过载（多教室并行度 = detect_workers）
+        app.state.detect_executor = ThreadPoolExecutor(
+            max_workers=max(1, detect_workers),
+            thread_name_prefix="detect")
+        # 预热（face-backend 同款模式）：惰性 detector 提前加载权重，
+        # 失败不阻断启动（首个真实请求会给出可操作错误）
+        if detector is None:
+            try:
+                import numpy as np
+                app.state.detector.detect_persons(
+                    np.zeros((64, 64, 3), dtype=np.uint8))
+            except Exception as e:  # pragma: no cover - 环境相关
+                log.warning("detector warmup skipped: %s", e)
         auth.set_client(None, dev=dev)
         if not dev:
             # 非 dev 模式：teamusers 客户端在 main 入口注入（见 app/main.py）
@@ -123,6 +140,7 @@ def create_app(
                     audience=cfg.teamusers_audience,
                     issuer=cfg.teamusers_issuer), dev=False)
         yield
+        app.state.detect_executor.shutdown(wait=False)
         await app.state.storage.close()
 
     app = FastAPI(
@@ -228,9 +246,12 @@ def create_app(
             if owns_client:
                 await client.aclose()
 
-        # 3) 人员检测 + 座位映射
-        detections: list[Detection] = app.state.detector.detect_persons(
-            img.bgr)
+        # 3) 人员检测（线程池：CPU 推理不阻塞事件循环，多教室并行）
+        #    + 座位映射
+        loop = asyncio.get_running_loop()
+        detections: list[Detection] = await loop.run_in_executor(
+            app.state.detect_executor,
+            app.state.detector.detect_persons, img.bgr)
         seats = assign_seats([d.foot_point for d in detections], layout,
                              scale_factor=app.state.scale_factor)
 

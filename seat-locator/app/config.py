@@ -40,6 +40,7 @@ class Config:
     scale_factor: float
     detector_weights: str
     detector_conf: float
+    detect_workers: int
     dev: bool
     log_level: str
 
@@ -74,6 +75,7 @@ def from_env(env: dict[str, str] | None = None) -> Config:
         scale_factor=float(e.get("SEAT_SCALE_FACTOR", "0.45") or 0.45),
         detector_weights=e.get("SEAT_DETECTOR_WEIGHTS", "yolo26s.pt"),
         detector_conf=float(e.get("SEAT_DETECTOR_CONF", "0.25") or 0.25),
+        detect_workers=_int(e.get("SEAT_DETECT_WORKERS"), 2),
         dev=dev,
         log_level=e.get("SEAT_LOG_LEVEL", "info"),
     )

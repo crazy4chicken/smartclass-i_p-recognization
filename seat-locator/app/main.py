@@ -32,6 +32,7 @@ def main() -> int:
         image_max_pixels=cfg.image_max_pixels,
         detector_weights=cfg.detector_weights,
         detector_conf=cfg.detector_conf,
+        detect_workers=cfg.detect_workers,
         face_backend_url=cfg.face_backend_url,
         face_backend_timeout=cfg.face_backend_timeout_s,
     )

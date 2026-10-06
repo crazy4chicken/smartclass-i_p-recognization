@@ -5,12 +5,23 @@ from app.associate import associate_faces
 from app.faceclient import FaceResult
 
 
-def face(x1, y1, x2, y2, uid="u-1", sim=0.7, matched=True):
+def face(x1, y1, x2, y2, uid="u-1", sim=0.7, matched=True, det=0.9):
     return FaceResult(bbox=(x1, y1, x2, y2), matched=matched,
-                      user_id=uid, similarity=sim)
+                      user_id=uid, similarity=sim, det_score=det)
 
 
 class TestAssociateFaces:
+    def test_det_score_breaks_iou_tie(self):
+        """多脸同人且 IoU 完全相等 → det_score 高者胜（计划 Task5 承诺）。"""
+        persons = [(100, 0, 200, 300)]
+        # 两张脸与 person 框 IoU 相等（对称位置同尺寸），det_score 不同
+        low = face(120, 30, 160, 70, uid="u-low", det=0.35)
+        high = face(140, 30, 180, 70, uid="u-high", det=0.93)
+        for order in ([low, high], [high, low]):  # 顺序无关
+            out = associate_faces(persons, order)
+            assert out[0].user_id == "u-high", \
+                "IoU 平局应由 det_score 决断"
+
     def test_center_containment(self):
         """脸中心落在 person 框内 → 关联。"""
         persons = [(100, 0, 200, 300), (300, 0, 400, 300)]

@@ -4,8 +4,13 @@
 1) 人脸框中心落在 person 框内的候选集合中取 IoU 最高者（包含优先）；
 2) 无人满足包含时，回退到与任意 person 框的最大 IoU（>0）；
 3) 一张脸最多关联一个 person，一个 person 最多收一张脸——
-   冲突时按 IoU 降序贪心分配。
-输出与 person 输入顺序一一对应；未关联的 face 只计入 faces_unmatched。
+   冲突按 (包含, IoU 降序, det_score 降序) 贪心分配：
+   几何证据（包含/IoU）分不出高下时，取人脸检测置信度更高者
+   （误检脸 det_score 通常显著偏低）；
+4) 完全零重叠的 face 不分配，只计入 faces_unmatched。
+
+det_score 语义：SCRFD 人脸检测器对"该区域是一张脸"的置信度
+（face-backend 计算），与 similarity（ArcFace 身份相似度）正交。
 """
 from __future__ import annotations
 
@@ -71,8 +76,10 @@ def associate_faces(person_bboxes: list[BBox],
             if contained or iou > 0:
                 candidates.append((fi, pi, iou, contained))
 
-    # 包含优先，其次 IoU；稳定排序保证确定性
-    candidates.sort(key=lambda c: (not c[3], -c[2]))
+    # 决断优先级：包含 > IoU > det_score（检测置信度平局决断，
+    # 兼作确定性保证——同分时稳定排序保持输入顺序）
+    candidates.sort(
+        key=lambda c: (not c[3], -c[2], -faces[c[0]].det_score))
 
     face_taken: set[int] = set()
     person_taken: set[int] = set()

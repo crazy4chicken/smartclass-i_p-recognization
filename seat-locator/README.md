@@ -139,6 +139,7 @@ E2E（`tests/test_e2e.py`）：真实 yolo26s + 本地图片服务 + 真实 Post
 | `SEAT_SCALE_FACTOR` | `0.45` | 座位阈值系数 |
 | `SEAT_DETECTOR_WEIGHTS` | `yolo26s.pt` | 检测权重 |
 | `SEAT_DETECTOR_CONF` | `0.25` | 检测置信度 |
+| `SEAT_DETECT_WORKERS` | `2` | 推理线程池大小（多教室并行度） |
 | `SEAT_DEV` | `false` | 开发旁路（合成 claims，仅本地） |
 
 \* `SEAT_DEV=true` 时全部可省略。
