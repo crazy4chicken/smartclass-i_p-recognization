@@ -1,0 +1,31 @@
+# nsc-seatlocator v0.2.0 运行时依赖
+# 安装：pip install -r requirements.txt
+# 版本为已验证组合（Python 3.12，2026-10-06 全部 91 项测试通过）
+
+# ---- Web 框架 ----
+fastapi>=0.142,<0.143
+uvicorn[standard]>=0.54,<0.55          # [standard] 含 httptools/uvloop加速
+
+# ---- 出站 HTTP（图片下载 + face-backend 调用）----
+httpx>=0.28,<0.29
+
+# ---- 图像与数值 ----
+numpy>=2.5,<3
+opencv-python-headless>=5.0,<6         # headless：服务器无 GUI 环境
+
+# ---- PostgreSQL（布局 + locate 审计）----
+asyncpg>=0.31,<0.32
+
+# ---- 集群鉴权（teamusers JWKS 验签 + 权限判定）----
+teamusers-sdk>=0.4.0,<0.5
+
+# ---- 人员检测（可选：--detector 分组）----
+# ultralytics（YOLO26）较大，默认注释；需要真实检测时取消注释：
+# ultralytics>=8.4.173,<9
+# torch 为 CPU 版，需指定 PyTorch 官方源安装：
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+# torch>=2.14
+
+# ---- 开发/测试（可选：--dev 分组）----
+# pytest>=9.1
+# pytest-asyncio>=1.4

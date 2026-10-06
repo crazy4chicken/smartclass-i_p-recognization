@@ -1,0 +1,293 @@
+GitHub - crazy4chicken/nsc-teamusers: Standalone IAM microservice for Nekostick integration · GitHub
+Skip to content
+Navigation Menu
+Sign in Appearance settings
+Platform AI CODE CREATION GitHub Copilot Write better code with AI
+GitHub Copilot app Direct agents from issue to merge
+MCP Registry Integrate external tools
+DEVELOPER WORKFLOWS Actions Automate any workflow
+Codespaces Instant dev environments
+Issues Plan and track work
+Code Review Manage code changes
+Code Quality Enforce quality at merge
+APPLICATION SECURITY GitHub Advanced Security Find and fix vulnerabilities
+Code security Secure your code as you build
+Secret protection Stop leaks before they start
+EXPLORE Why GitHub
+Documentation
+Blog
+Changelog
+Marketplace
+View all features
+Solutions BY COMPANY SIZE Enterprises
+Small and medium teams
+Startups
+Nonprofits
+BY USE CASE App Modernization
+DevSecOps
+DevOps
+CI/CD
+View all use cases
+BY INDUSTRY Healthcare
+Financial services
+Manufacturing
+Government
+View all industries
+View all solutions
+Resources EXPLORE BY TOPIC AI
+Software Development
+DevOps
+Security
+View all topics
+EXPLORE BY TYPE Customer stories
+Events & webinars
+Ebooks & reports
+Business insights
+GitHub Skills
+SUPPORT & SERVICES Documentation
+Customer support
+Community forum
+Trust center
+Partners
+View all resources
+Open Source COMMUNITY GitHub Sponsors Fund open source developers
+PROGRAMS Security Lab
+Maintainer Community
+GitHub Stars
+Archive Program
+REPOSITORIES Topics
+Trending
+Collections
+Enterprise ENTERPRISE SOLUTIONS Enterprise platform AI-powered developer platform
+AVAILABLE ADD-ONS GitHub Advanced Security Enterprise-grade security features
+Copilot for Business Enterprise-grade AI features
+Premium Support Enterprise-grade 24/7 support
+Pricing
+Search /
+Sign in
+Sign up Appearance settings
+You signed in with another tab or window. Reload to refresh your session.
+You signed out in another tab or window. Reload to refresh your session.
+You switched accounts on another tab or window. Reload to refresh your session.
+Dismiss alert
+{{ message }}
+crazy4chicken
+/
+nsc-teamusers
+Public
+Notifications
+You must be signed in to change notification settings
+Fork
+0
+Star
+0
+Code
+Issues
+0
+Pull requests
+0
+Actions
+Security and quality
+0
+Insights
+Additional navigation options
+Code
+Issues
+Pull requests
+Actions
+Security and quality
+Insights
+main
+1 Branch 10 Tags
+Go to file
+Code Open more actions menu
+Latest commit
+ruattd
+feat(api): add role permission listing
+success
+Oct 6, 2026
+1f7ccbf  ·  Oct 6, 2026
+History
+86 Commits Open commit details
+86 Commits
+Folders and files
+Name Name Last commit message
+Last commit date
+.github/ workflows
+.github/ workflows
+refactor(apidocs): extract docs toolchain into standalone module and …
+Oct 3, 2026
+apidocs
+apidocs
+feat(authz): add scoped team baselines and release SDKs 0.4.0
+Oct 5, 2026
+cmd
+cmd
+feat(teamusers): add TEAMUSERS_DB_SCHEMA opt-in schema isolation
+Oct 3, 2026
+docs
+docs
+feat(api): add role permission listing
+Oct 6, 2026
+internal
+internal
+feat(api): add role permission listing
+Oct 6, 2026
+migrations
+migrations
+feat(authz): add scoped team baselines and release SDKs 0.4.0
+Oct 5, 2026
+sdk
+sdk
+test(python): exercise conditional denies with team context
+Oct 5, 2026
+test
+test
+feat(api): add role permission listing
+Oct 6, 2026
+.gitignore
+.gitignore
+chore(docs): generate the OpenAPI artifact at build time
+Sep 26, 2026
+AGENTS.md
+AGENTS.md
+feat(teamusers): add TEAMUSERS_DB_SCHEMA opt-in schema isolation
+Oct 3, 2026
+LICENSE
+LICENSE
+chore: add AGPL-3.0 license
+Sep 24, 2026
+PLAN.md
+PLAN.md
+feat(teamusers): add inbound OIDC federation, SCIM 2.0 provisioning, …
+Sep 30, 2026
+README.md
+README.md
+feat(authz): add scoped team baselines and release SDKs 0.4.0
+Oct 5, 2026
+go.mod
+go.mod
+refactor(apidocs): extract docs toolchain into standalone module and …
+Oct 3, 2026
+go.sum
+go.sum
+feat: add passkey/WebAuthn registration and assertion login
+Sep 25, 2026
+package.json
+package.json
+refactor(apidocs): extract docs toolchain into standalone module and …
+Oct 3, 2026
+pnpm-lock.yaml
+pnpm-lock.yaml
+refactor(apidocs): extract docs toolchain into standalone module and …
+Oct 3, 2026
+pnpm-workspace.yaml
+pnpm-workspace.yaml
+refactor(apidocs): extract docs toolchain into standalone module and …
+Oct 3, 2026
+View all files
+Repository files navigation
+README
+AGPL-3.0 license
+More items
+Teamusers
+teamusers is a standalone identity and access microservice for the
+Nekostick service fleet: users, teams, groups, roles, permissions,
+credentials, sessions, and audit — issuing EdDSA JWTs and serving JWKS for
+the rest of the fleet.
+Features
+Password, TOTP 2FA (with backup codes), and passkey/WebAuthn
+authentication; OIDC inbound federation with PKCE.
+SCIM 2.0 inbound provisioning for external identity providers.
+RBAC with team-baseline bindings, conditional (ABAC) grants, wildcard matching, and explicit deny; the admin plane itself is gated by iam:* permissions.
+MFA enforcement policies, breached-password screening, and step-up
+authentication for sensitive operations.
+Refresh-token rotation with family reuse detection, session concurrency
+limits, and idle timeouts.
+Runtime signing-key rotation with overlapping JWKS publication.
+Audited, time-boxed admin impersonation.
+Append-only audit log with retention, streaming export, and HMAC-signed
+forwarding; lifecycle and permission events over NATS JetStream.
+Self-service registration (email verification, admin approval), /me
+profile/credential/session management, and login activity.
+Client SDKs
+Verify tokens and check permissions locally — no introspection call on the
+hot path. All three SDKs share the same claims contract, permission cache,
+and middleware guards.
+Language
+Package
+Install
+Go
+sdk/go
+go get github.com/crazy4chicken/nsc-teamusers/sdk/go
+TypeScript
+sdk/ts
+npm i teamusers-sdk
+Python
+sdk/python
+pip install teamusers-sdk
+See the SDK usage guide
+for verification, authorization, step-up, and event-subscription examples.
+Quickstart
+Start PostgreSQL 16 and create an empty database, then:
+export TEAMUSERS_CONNECTION_STRING= ' postgres://<user>:<password>@127.0.0.1:5432/teamusers?sslmode=disable '
+export TEAMUSERS_LISTEN_ADDRESS=127.0.0.1
+export TEAMUSERS_LISTEN_PORT=8080
+export TEAMUSERS_KEY_DIR= " $PWD /data/keys "
+go run ./cmd/teamusers run
+Startup applies the embedded migrations and generates a signing key when
+the key directory is empty. Verify with:
+curl -fsS http://127.0.0.1:8080/healthz
+curl -fsS http://127.0.0.1:8080/readyz
+Production builds are static Linux/amd64 binaries:
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+go build -trimpath -ldflags ' -s -w ' -o teamusers ./cmd/teamusers
+Deployment is handled by Nekostick (process lifecycle, HOST / PORT
+injection, health supervision); see the
+deployment guide .
+Documentation
+https://crazy4chicken.github.io/nsc-teamusers/
+Guides (getting started, security, operations, SDKs, deployment), the full
+OpenAPI 3.1 reference, and configuration details.
+License
+Licensed under the GNU Affero General Public License, Version 3.0. See
+LICENSE or https://www.gnu.org/licenses/agpl-3.0.html .
+About
+Standalone IAM microservice for Nekostick integration
+crazy4chicken.github.io/nsc-teamusers/
+Resources
+Readme
+AGPL-3.0 license
+Activity
+Custom properties
+Stars
+0 stars
+Watchers
+0 watching
+Forks
+0 forks
+Report repository
+Releases 6  (6)
+v0.4.1 Latest
+Oct 6, 2026
++ 5 releases
+Contributors 1  (1)
+ruattd 任天天
+Languages
+Go 83.7%
+TypeScript 8.2%
+Python 8%
+PLpgSQL 0.1%
+Footer
+© 2026 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Community
+Docs
+Contact
+Manage cookies
+Do not share my personal information
+You can’t perform that action at this time.

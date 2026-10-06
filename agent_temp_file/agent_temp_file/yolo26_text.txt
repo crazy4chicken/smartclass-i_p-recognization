@@ -1,0 +1,213 @@
+Ultralytics YOLO26
+Ultralytics YOLO27： 即将推出。加入候补名单。
+跳转到主要内容
+搜索... Ctrl K
+主页
+快速入门
+主页
+模式
+任务
+模型 概述
+YOLO27（即将推出）
+YOLO26 🚀
+YOLO12
+YOLO11
+YOLOv10
+YOLOv9
+YOLOv8
+YOLOv7
+YOLOv6
+YOLOv5
+YOLOv4
+YOLOv3
+SAM 3（万物分割模型 3）
+SAM 2（万物分割模型 2）
+SAM（万物分割模型）
+MobileSAM（移动端万物分割模型）
+FastSAM（快速万物分割模型）
+YOLO-NAS（神经架构搜索）
+RT-DETR（实时检测 Transformer）
+YOLO-World
+YOLOE（实时万物感知）
+Ultralytics LLM 接口
+比较
+数据集
+解决方案
+指南
+集成
+平台
+Rust 推理
+参考
+帮助
+Get Started
+Annotate, train and deploy YOLO models in one click.
+Cloud training
+Dataset annotation
+One-click inference
+$25 free credits with work email
+Get Started Sign in
+Toggle Sidebar
+文档
+模型
+YOLO26 🚀
+Select language GitHub repository GitHub 138.1k Switch apps Get Started
+Ultralytics YOLO26 #
+YOLO26
+ultralytics
+public 26
+Newest SOTA Ultralytics models, released January 2026. Smaller, faster, and more accurate than previous versions with native end-to-end inference.
+72 35 models 1.5 GB Aug 21, 2026
+yolo26x-depth yolo26l-depth yolo26m-depth + 32
+概述 #
+Ultralytics YOLO26 是一套统一的实时视觉模型系列，相关介绍见 Ultralytics YOLO26 论文 。该系列引入了原生端到端推理、更轻量的检测头、更新后的训练方案，以及针对检测、分割、姿态估计、分类和旋转框检测任务设计的专用检测头。
+在五种检测模型尺寸中，YOLO26 在 COCO 上达到 40.9-57.5 mAP ，T4 TensorRT 延迟为 1.7-11.8 ms 。论文还报告称，在 Intel Xeon CPU @ 2.00 GHz 上，与 YOLO11n 相比，YOLO26n 的 CPU ONNX 推理速度最高可提升 43% 。
+查看 尚未发布的 YOLO27 预览 ，了解计划中的架构、任务和初步基准测试结果。
+观看： 如何在 Google Colab 中使用自定义数据集训练 YOLO26 模型。
+快速入门
+Python CLI
+from ultralytics import YOLO
+model = YOLO( "yolo26n.pt" ) # 加载一个预训练的 YOLO26n 模型
+results = model( "path/to/bus.jpg" ) # 运行推理
+在 Ultralytics Platform 上试用
+直接在 Ultralytics Platform 上探索和运行 YOLO26 模型。
+YOLO26 模型系列围绕四个设计方向构建：
+原生端到端推理： 可选的一对一检测头无需非极大值抑制 (NMS) 即可生成预测结果，从而简化部署并减少后处理。
+更轻量的边界框回归： YOLO26 移除了分布焦点损失 (DFL)，降低了检测头的复杂度，同时保留不受限制的回归范围。
+训练方案更新： 训练流水线结合了 MuSGD （Muon + SGD 混合优化器）、 Progressive Loss 和 STAL （小目标感知标签分配），以改进优化过程、将监督重点转向推理时使用的检测头，并确保小目标有足够的正标签覆盖。已发布检查点所用的完整超参数记录在 YOLO26 训练方案指南 中。
+任务专用检测头和损失： YOLO26 针对实例分割、语义分割变体、姿态估计和旋转框检测引入了专门设计，同时让不同任务共用一条模型流水线。
+这些更新共同改善了不同模型尺寸和部署目标下准确率与延迟之间的权衡。
+主要功能 #
+无 DFL 回归 YOLO26 移除了分布焦点损失 (DFL)，降低了检测头的复杂度并简化了导出流程。
+端到端无 NMS 推理 YOLO26 支持使用 nms=False 进行 原生端到端 推理，无需单独执行 NMS。默认的一对多路径使用 NMS 来提高准确率。
+Progressive Loss + STAL Progressive Loss 将训练重点转向推理时使用的检测头，而 STAL 则提升小目标的正标签覆盖率。
+MuSGD 优化器 这是一种结合 SGD 与 Muon 的混合优化器，将大语言模型训练中的优化思路应用于计算机视觉。
+高效部署 简化的检测头和可选的无 NMS 路径降低了不同导出目标和硬件配置下的推理开销，其中包括论文报告的 YOLO26n 相比 YOLO11n 的 CPU ONNX 加速效果。
+实例分割增强 引入语义分割损失以改善模型收敛，并升级原型模块以利用多尺度信息，从而提升掩码质量。论文报告称，在 COCO 实例分割任务上，相比 YOLO11，边界框 AP 最高提升 +2.5，掩码 AP 最高提升 +3.7。
+精准姿态估计 集成 残差对数似然估计 (RLE)，以实现更准确的关键点定位，并优化解码流程来提高推理速度。论文报告称，在 COCO 姿态估计任务上，相比 YOLO11，AP 最高提升 +7.2。
+改进的 OBB 解码 引入专用角度损失，以提高正方形目标的检测准确率，并优化 OBB 解码来解决边界不连续问题。论文报告称，在 DOTA-v1.0 旋转框检测任务上，相比 YOLO11，mAP 最高提升 +3.4。
+支持的任务和模式 #
+YOLO26 在五种模型尺寸上支持 Ultralytics 的标准任务集：
+模型 文件名 任务 训练 验证 推理 导出
+YOLO26 yolo26n.pt yolo26s.pt yolo26m.pt yolo26l.pt yolo26x.pt 检测 ✅ ✅ ✅ ✅
+YOLO26-seg yolo26n-seg.pt yolo26s-seg.pt yolo26m-seg.pt yolo26l-seg.pt yolo26x-seg.pt 实例分割 ✅ ✅ ✅ ✅
+YOLO26-sem yolo26n-sem.pt yolo26s-sem.pt yolo26m-sem.pt yolo26l-sem.pt yolo26x-sem.pt 语义分割 ✅ ✅ ✅ ✅
+YOLO26-depth yolo26n-depth.pt yolo26s-depth.pt yolo26m-depth.pt yolo26l-depth.pt yolo26x-depth.pt 深度估计 ✅ ✅ ✅ ✅
+YOLO26-cls yolo26n-cls.pt yolo26s-cls.pt yolo26m-cls.pt yolo26l-cls.pt yolo26x-cls.pt 分类 ✅ ✅ ✅ ✅
+YOLO26-pose yolo26n-pose.pt yolo26s-pose.pt yolo26m-pose.pt yolo26l-pose.pt yolo26x-pose.pt 姿态/关键点 ✅ ✅ ✅ ✅
+YOLO26-obb yolo26n-obb.pt yolo26s-obb.pt yolo26m-obb.pt yolo26l-obb.pt yolo26x-obb.pt 定向检测 ✅ ✅ ✅ ✅
+该统一框架涵盖实时检测、实例分割、语义分割、单目深度估计、分类、姿态估计和旋转框目标检测，并支持训练、验证、推理和导出。
+仅提供架构的变体
+yolo26-p2.yaml 和 yolo26-p6.yaml 分别添加 P2（小目标）或 P6（大输入）检测头，并且仅以 YAML 架构文件形式提供。目前尚未发布特定模型尺寸的 yolo26*-p2.pt 或 yolo26*-p6.pt 权重。你可以从 YAML 实例化缩放后的配置（例如 YOLO("yolo26n-p6.yaml") ），并根据需要进行训练或微调。
+性能指标 #
+性能
+检测（COCO） 分割（COCO） 语义分割（Cityscapes） 深度估计（NYU Depth V2） 分类（ImageNet） 姿态（COCO） OBB（DOTAv1）
+这些模型在 COCO 上训练，包含 80 个预训练类别；使用示例请参阅 检测文档 。
+模型 尺寸
+(像素) mAP 验证集
+50-95 mAP 验证
+50-95（端到端） 速度
+CPU ONNX
+(毫秒) 速度
+T4 TensorRT10
+（ms） 参数
+(M) FLOPs
+(B)
+YOLO26n 640 40.9 40.1 38.9 ± 0.7 1.7 ± 0.0 2.4 5.5
+YOLO26s 640 48.6 47.8 87.2 ± 0.9 2.5 ± 0.0 9.5 20.9
+YOLO26m 640 53.1 52.5 220.0 ± 1.4 4.7 ± 0.1 20.4 68.4
+YOLO26l 640 55.0 54.4 286.2 ± 2.0 6.2 ± 0.2 24.8 86.8
+YOLO26x 640 57.5 56.9 525.8 ± 4.0 11.8 ± 0.2 55.7 194.4
+参数量和 FLOPs 数值基于融合后的模型计算，即完成 Conv/BatchNorm 折叠并移除未使用的检测分支后。速度测量会选择带有 nms=False 的无 NMS 检测头。预训练检查点保留完整的训练架构，因此显示的数值可能更高。
+使用示例 #
+本节提供简单的 YOLO26 训练和推理示例。有关这些模式及其他 模式 的完整文档，请参阅 预测 、 训练 、 验证 和 导出 文档页面。
+请注意，以下示例适用于 YOLO26 检测 模型，用于 目标检测 。有关支持的其他任务，请参阅 分割 、 语义分割 、 深度估计 、 分类 、 姿态估计 和 OBB 文档。
+示例
+Python CLI
+PyTorch 预训练的 *.pt 模型以及配置 *.yaml 文件都可以传递给 YOLO() 类，从而在 Python 中创建模型实例：
+from ultralytics import YOLO
+# 加载经过 COCO 预训练的 YOLO26n 模型
+model = YOLO( "yolo26n.pt" )
+# 使用 YOLO26n 模型对“bus.jpg”图像进行推理
+results = model( "path/to/bus.jpg" )
+# 使用 COCO8 示例数据集训练模型 100 个 epoch
+results = model.train(data= "coco8.yaml" , epochs= 100 , imgsz= 640 )
+双头架构
+YOLO26 检测模型采用 双头架构 ，可灵活适应不同的部署场景：
+一对多头（默认） ：生成传统的 YOLO 输出，需要进行 NMS 后处理，输出 (N, nc + 4, 8400) ，其中 nc 是类别数。该检测头通常能达到略高的准确率，但需要额外的处理。
+一对一头（ nms=False ） ：生成无需 NMS 的端到端预测，输出 (N, 300, 6) ，每张图像最多检测 300 个目标。该检测头针对快速推理和简化部署进行了优化。
+你可以在导出、预测或验证时切换检测头：
+Python CLI
+from ultralytics import YOLO
+model = YOLO( "yolo26n.pt" )
+# 使用一对多头（默认，Ultralytics 会应用 NMS）
+results = model.predict( "image.jpg" ) # inference
+metrics = model.val(data= "coco.yaml" ) # validation
+model.export( format = "onnx" ) # export
+# 启用无 NMS 的一对一头
+results = model.predict( "image.jpg" , nms= False ) # inference
+metrics = model.val(data= "coco.yaml" , nms= False ) # validation
+model.export( format = "onnx" , nms= False ) # export
+预测和验证默认使用一对多头，以确保准确率。使用 nms=False 进行无 NMS 推理，或使用 nms=True 在受支持的导出格式中嵌入 NMS。无论选择哪种方式，两个检测头都会接受训练。有关输出格式和导出兼容性，请参阅 端到端检测指南 。
+YOLOE-26：开放词汇检测与分割 #
+YOLO26 也支持 YOLOE-26 ，这是一种开放词汇变体，可以根据 文本提示 、 视觉提示 或 无提示模式 检测和分割目标类别，而不是依赖训练时学到的固定类别列表。YOLOE-26 保留了 YOLO26 可选的无 NMS 端到端（e2e）检测头，因此开放词汇推理速度足够快，适用于目标类别会随时间变化的动态环境。YOLOE-26x 在 LVIS minival 上采用文本提示时达到 40.6 AP ，采用视觉提示时达到 38.5 AP ，无提示时达到 31.1 AP ——这些是论文中的非端到端数据，其端到端检测头的结果分别低 1.1、2.3 和 1.2 AP。
+有关各尺度的性能表、无提示变体和完整用法示例，请参阅 YOLOE 文档 。
+引用与致谢 #
+如需全面了解 YOLO26 架构、训练方案、任务检测头以及 YOLOE-26 开放词汇扩展，请阅读 Ultralytics YOLO26：统一的实时端到端视觉模型 。如果你在研究中使用 YOLO26，请引用：
+引用格式
+BibTeX
+@misc{jocher2026ultralyticsyolo26unifiedrealtime,
+title = {Ultralytics YOLO26: Unified Real-Time End-to-End Vision Models},
+author = {Glenn Jocher and Jing Qiu and Mengyu Liu and Shuai Lyu and Fatih Cagatay Akyon and Muhammet Esat Kalfaoglu},
+year = {2026},
+eprint = {2606.03748},
+archivePrefix = {arXiv},
+primaryClass = {cs.CV},
+doi = {10.48550/arXiv.2606.03748},
+url = {https://arxiv.org/abs/2606.03748},
+}
+YOLO26 代码、模型和文档可在 Ultralytics GitHub 仓库 和 Ultralytics 文档 中获取，并依据 AGPL-3.0 和 企业版 许可提供。
+常见问题 #
+YOLO26 的主要改进有哪些？
+无 DFL 回归 ：简化检测头和导出流程
+端到端无 NMS 推理 ：支持使用 nms=False 进行无 NMS 推理
+渐进式损失 + STAL ：改善训练对齐效果和小目标标签覆盖率
+MuSGD 优化器 ：结合 SGD 与受 Muon 启发的优化方法，实现稳定训练
+特定任务的检测头和损失函数 ：改进对分割、姿态估计和有向目标检测的支持
+YOLO26 支持哪些任务？
+YOLO26 是一个 统一的模型系列 ，可端到端支持多种计算机视觉任务：
+目标检测
+实例分割
+语义分割
+单目深度估计
+图像分类
+姿态估计
+有向目标检测（OBB）
+每种尺寸变体（n、s、m、l、x）都支持所有任务，还可以通过 YOLOE-26 使用开放词汇版本。
+YOLO26 为何适合高效部署？
+YOLO26 通过以下方式提升部署效率：
+可选的原生端到端推理，无需 NMS（ nms=False ）
+无 DFL 回归和更轻量的检测头
+导出融合后的模型，移除仅用于训练的辅助组件
+与 Intel Xeon CPU @ 2.00 GHz 上的 YOLO11n 相比，YOLO26n 的 CPU ONNX 推理速度最高提升 43%
+支持灵活的导出格式，包括 TensorRT、ONNX、CoreML、LiteRT 和 OpenVINO
+如何开始使用 YOLO26？
+YOLO26 模型可通过 ultralytics 包下载。安装或更新该包，然后加载模型：
+from ultralytics import YOLO
+# 加载预训练的 YOLO26 nano 模型
+model = YOLO( "yolo26n.pt" )
+# 对图像进行推理
+results = model( "image.jpg" )
+有关训练、验证和导出的说明，请参阅 使用示例 部分。
+贡献者
+glenn-jocher 14 raimbekovm 11 Laughing-q 5 Y-T-G 3 pderrenger 2 RizwanMunawar 1 Bovey0809 1 ambitious-octopus 1 fcakyon 1 lmycross 1
+创建时间 2025年9月25日 更新时间 3周前
+评论
+本页内容
+概述 主要功能 支持的任务和模式 性能指标 使用示例 YOLOE-26：开放词汇检测与分割 引用与致谢 常见问题 YOLO26 的主要改进有哪些？ YOLO26 支持哪些任务？ YOLO26 为何适合高效部署？ 如何开始使用 YOLO26？
+通过 AI 探索
+OpenAI Open in ChatGPT Claude Open in Claude Google Open in Gemini Kimi Open in Kimi
+上一页
+Ultralytics YOLO27 实时目标检测
+下一页
+Ultralytics YOLO26 模式
+Ask AI Ultralytics

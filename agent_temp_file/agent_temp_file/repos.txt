@@ -1,0 +1,259 @@
+ Crazy for Chicken · GitHub
+ Skip to content
+ Navigation Menu
+Sign inAppearance settings
+crazy4chicken
+PlatformAI CODE CREATIONGitHub CopilotWrite better code with AI
+GitHub Copilot appDirect agents from issue to merge
+MCP RegistryIntegrate external tools
+DEVELOPER WORKFLOWSActionsAutomate any workflow
+CodespacesInstant dev environments
+IssuesPlan and track work
+Code ReviewManage code changes
+Code QualityEnforce quality at merge
+APPLICATION SECURITYGitHub Advanced SecurityFind and fix vulnerabilities
+Code securitySecure your code as you build
+Secret protectionStop leaks before they start
+EXPLOREWhy GitHub
+Documentation
+Blog
+Changelog
+Marketplace
+View all features
+SolutionsBY COMPANY SIZEEnterprises
+Small and medium teams
+Startups
+Nonprofits
+BY USE CASEApp Modernization
+DevSecOps
+DevOps
+CI/CD
+View all use cases
+BY INDUSTRYHealthcare
+Financial services
+Manufacturing
+Government
+View all industries
+View all solutions
+ResourcesEXPLORE BY TOPICAI
+Software Development
+DevOps
+Security
+View all topics
+EXPLORE BY TYPECustomer stories
+Events & webinars
+Ebooks & reports
+Business insights
+GitHub Skills
+SUPPORT & SERVICESDocumentation
+Customer support
+Community forum
+Trust center
+Partners
+View all resources
+Open SourceCOMMUNITYGitHub SponsorsFund open source developers
+PROGRAMSSecurity Lab
+Maintainer Community
+GitHub Stars
+Archive Program
+REPOSITORIESTopics
+Trending
+Collections
+EnterpriseENTERPRISE SOLUTIONSEnterprise platformAI-powered developer platform
+AVAILABLE ADD-ONSGitHub Advanced SecurityEnterprise-grade security features
+Copilot for BusinessEnterprise-grade AI features
+Premium SupportEnterprise-grade 24/7 support
+Pricing
+Search/
+Sign in
+Sign upAppearance settings
+ You signed in with another tab or window. Reload to refresh your session.
+ You signed out in another tab or window. Reload to refresh your session.
+ You switched accounts on another tab or window. Reload to refresh your session.
+Dismiss alert
+ {{ message }}
+ Crazy for Chicken
+ 疯狂疯狂星期四，两块原味鸡9.9～
+ China
+ Overview
+ Repositories
+ Projects
+ Packages
+ People
+ More
+ Overview
+ Repositories
+ Projects
+ Packages
+ People
+ Popular repositories
+ Loading
+ nekostick-svchost
+ nekostick-svchost
+ Public
+ Multi-instance microservice manager for Nekostick
+ C#
+ nsc-teamusers
+ nsc-teamusers
+ Public
+ Standalone IAM microservice for Nekostick integration
+ Go
+ face-backend
+ face-backend
+ Public
+ Python
+ nsc-msghub
+ nsc-msghub
+ Public
+ Message & notification microservice for Nekostick integration
+ Go
+ smartclass-web
+ smartclass-web
+ Public
+ Vue
+ nsc-filehouse
+ nsc-filehouse
+ Public
+ Object storage microservice for Nekostick integration
+ Go
+ Repositories
+ -->
+ Loading
+ Type
+ Select type
+ All
+ Public
+ Sources
+ Forks
+ Archived
+ Mirrors
+ Templates
+ Language
+ Select language
+ All
+ C#
+ Dart
+ Go
+ Python
+ Vue
+ Sort
+ Select order
+ Last updated
+ Name
+ Stars
+ Showing 9 of 9 repositories
+ smartclass-web
+ Public
+ crazy4chicken/smartclass-web's past year of commit activity
+ Vue
+ 0
+ 0
+ 0
+ 0
+ Updated Oct 6, 2026
+ nsc-teamusers
+ Public
+ Standalone IAM microservice for Nekostick integration
+ Uh oh!
+There was an error while loading. Please reload this page.
+ crazy4chicken/nsc-teamusers's past year of commit activity
+ Go
+ 0
+AGPL-3.0
+ 0
+ 0
+ 0
+ Updated Oct 6, 2026
+ nsc-filehouse
+ Public
+ Object storage microservice for Nekostick integration
+ crazy4chicken/nsc-filehouse's past year of commit activity
+ Go
+ 0
+ 0
+ 0
+ 0
+ Updated Oct 6, 2026
+ nsc-msghub
+ Public
+ Message & notification microservice for Nekostick integration
+ crazy4chicken/nsc-msghub's past year of commit activity
+ Go
+ 0
+ 0
+ 0
+ 0
+ Updated Oct 5, 2026
+ smartclass-webcam-server
+ Public
+ crazy4chicken/smartclass-webcam-server's past year of commit activity
+ Go
+ 0
+AGPL-3.0
+ 0
+ 0
+ 0
+ Updated Oct 5, 2026
+ smartclass-dispatchub
+ Public
+ crazy4chicken/smartclass-dispatchub's past year of commit activity
+ Go
+ 0
+AGPL-3.0
+ 0
+ 0
+ 0
+ Updated Oct 5, 2026
+ smartclass-webcam-client
+ Public
+ crazy4chicken/smartclass-webcam-client's past year of commit activity
+ Dart
+ 0
+ 0
+ 0
+ 0
+ Updated Oct 5, 2026
+ nekostick-svchost
+ Public
+ Multi-instance microservice manager for Nekostick
+ crazy4chicken/nekostick-svchost's past year of commit activity
+ C#
+ 0
+AGPL-3.0
+ 0
+ 0
+ 0
+ Updated Oct 5, 2026
+ face-backend
+ Public
+ crazy4chicken/face-backend's past year of commit activity
+ Python
+ 0
+AGPL-3.0
+ 0
+ 0
+ 0
+ Updated Oct 2, 2026
+ People
+ This organization has no public members. You must be a member to see who’s a part of this organization.
+ Top languages
+ Loading…
+ Uh oh!
+There was an error while loading. Please reload this page.
+ Most used topics
+ Loading…
+ Uh oh!
+There was an error while loading. Please reload this page.
+ Footer
+ © 2026 GitHub, Inc.
+ Footer navigation
+ Terms
+ Privacy
+ Security
+ Status
+ Community
+ Docs
+ Contact
+ Manage cookies
+ Do not share my personal information
+ You can’t perform that action at this time.

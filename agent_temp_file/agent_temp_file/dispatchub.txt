@@ -1,0 +1,34 @@
+ SmartClass Dispatch Hub
+ Skip to contentSmartClass Dispatch Hub
+SearchK
+ Main Navigation GuideAPI ReferenceDeploymentGitHub
+Appearance
+SmartClass Dispatch HubTimetable-driven classroom recording
+Imports course timetables, binds rooms to smartclass-webcam-server devices, starts and stops each lesson's recording automatically, and keeps every stream id and photo id addressable in PostgreSQL.
+Get Started
+Deploy
+Timetable import
+Upload a CSV of course, teacher, room and 节次 rows. dispatchub validates it, expands the week ranges and materializes one recording session per occurrence - dry-run first, never a partial commit.
+Room binding
+Bind each room_code to a webcam-server device and camera_enum once; the device's team and owner are snapshotted at bind time and drive scoped permissions.
+Scheduled recording
+A leader-elected scheduler starts every recording before the lesson, retries flaky devices, adopts orphaned upstream streams and stops at the lesson's end.
+Durable ids
+The webcam-server stream id and photo id are persisted in PostgreSQL, so recordings stay addressable across restarts; download URLs are minted live and never cached.
+Manual control
+Start, stop, switch a camera or take a snapshot mid-session, with X-Idempotency-Key replay protection and an actor audit trail in camera_commands.
+teamusers authorization
+Sign-in and permissions stay in teamusers. dispatchub verifies the JWT locally and resolves dispatch:read, dispatch:manage and dispatch:control grants on every request.
+What it is ​
+smartclass-dispatchub owns the classroom recording schedule. It is the service between the academic timetable and the camera fleet:
+Timetables in. A term plus its 节次 time table, then a CSV of course/teacher/room rows per teaching week. dispatchub validates every row and materializes concrete sessions.
+Recordings out. For each session the scheduler asks smartclass-webcam-server to start recording before the lesson and stop it at the end, and stores the returned stream_id.
+Artifacts on demand. Segments and photos are never mirrored: given a stored stream_id, dispatchub asks webcam-server for fresh download URLs (15-minute TTL) when a client asks for them.
+Authorization delegated. All access is authenticated and authorized by teamusers; dispatchub keeps no local accounts.
+Quick links ​
+Getting Started - run it locally against PostgreSQL.
+Deployment - the fleet compose file and the full DISPATCH_* reference.
+Permissions - the nine dispatch:* keys and the any > team > own ladder.
+API Usage - import, schedule, record, fetch artifacts.
+Operations - scheduler semantics, triage and outage behaviour.
+API Reference - the generated reference and the OpenAPI document.
