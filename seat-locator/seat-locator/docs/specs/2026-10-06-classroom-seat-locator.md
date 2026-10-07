@@ -54,14 +54,22 @@ Body: {"image_url": "https://...", "classroom_id": "room-301"}
   "persons": [
     {"user_id": "u-1001", "matched": true, "similarity": 0.71,
      "row": 3, "col": 5, "status": "seated",
-     "bbox": [x1,y1,x2,y2], "face_bbox": [x1,y1,x2,y2]},
+     "bbox": [x1,y1,x2,y2], "face_bbox": [x1,y1,x2,y2],
+     "assoc_iou": 0.42, "assoc_rejected": false},
     {"user_id": null, "matched": false, "row": null, "col": null,
-     "status": "non_seated", "bbox": [...], "face_bbox": null}
+     "status": "non_seated", "bbox": [...], "face_bbox": null,
+     "assoc_iou": null, "assoc_rejected": false}
   ],
-  "faces_unmatched": 1
+  "faces_unmatched": 1,
+  "assoc_rejected": 0
 }
 ```
 语义：person 为主键（检到人必有条目）；未匹配/无脸 → `user_id: null`；非就座 → `row/col: null`；未关联到 person 的人脸仅计入 `faces_unmatched`。
+
+**关联防护（P0/P1，2026-10-06 增补）**：
+- `assoc_iou`：该脸与人体框关联的 IoU（关联可信度），无脸为 null；
+- `assoc_rejected`：被**行一致性校验**拒配——脸中心 y 按布局排中心线推得的"隐含排"与脚点判定的排相差 > 1（ROW_SLACK，容忍头身在透视下漂一排）时，判定为透视遮挡串座风险，清空 user_id/matched/similarity，保留 face_bbox/det_score/assoc_iou 供调试；顶层 `assoc_rejected` 计数与 `faces_unmatched` 互斥（挂上被否决 vs 从未挂上）；
+- 运维告警：脸数 > 人体数、脸零关联占比 > 50%（疑似坐标系漂移或重度遮挡）、有人无脸（人体检测整体失效）时 log.warning。
 
 ### 4.2 布局管理端点
 

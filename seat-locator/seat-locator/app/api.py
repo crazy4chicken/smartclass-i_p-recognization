@@ -18,7 +18,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from app import auth
-from app.associate import associate_faces
+from app.associate import (associate_faces, associate_with_layout,
+                           warn_anomalies)
 from app.detector import Detection, Detector
 from app.faceclient import FaceBackendError, FaceClient, HttpFaceClient
 from app.imagefetch import ImageFetchError, fetch_image
@@ -47,12 +48,19 @@ class PersonOut(BaseModel):
     status: str
     bbox: list[float]
     face_bbox: list[float] | None
+    assoc_iou: float | None = Field(
+        None, description="关联可信度：胜出边的 face-person IoU；null=无脸")
+    assoc_rejected: bool = Field(
+        False, description="true=被行一致性校验拒配（防串座），"
+                           "身份字段已清空，face_bbox 仅存调试")
 
 
 class LocateResponse(BaseModel):
     persons_found: int
     persons: list[PersonOut]
     faces_unmatched: int
+    assoc_rejected: int = Field(
+        0, description="被行一致性校验拒配的关联数（不计入 faces_unmatched）")
 
 
 class ClassroomsOut(BaseModel):
@@ -267,11 +275,16 @@ def create_app(
         except FaceBackendError as e:
             raise ProblemError(e.status, e.code, e.detail) from e
 
-        # 5) 关联合并
-        assoc = associate_faces([d.bbox for d in detections], faces)
+        # 5) 关联合并（含 P0 行一致性校验）+ P1b 异常自检
+        assoc, assoc_rejected = associate_with_layout(
+            [d.bbox for d in detections], faces, seats, layout)
         matched_face_boxes = {tuple(a.face_bbox) for a in assoc if a.face_bbox}
         faces_unmatched = sum(
             1 for f in faces if tuple(f.bbox) not in matched_face_boxes)
+        for msg in warn_anomalies(len(faces), len(detections),
+                                  faces_unmatched):
+            log.warning("[locate] %s (classroom=%s)", msg,
+                        body.classroom_id)
 
         persons = []
         for det, seat, face in zip(detections, seats, assoc):
@@ -283,6 +296,9 @@ def create_app(
                 row=seat.row, col=seat.col, status=seat.status,
                 bbox=list(det.bbox),
                 face_bbox=list(face.face_bbox) if face.face_bbox else None,
+                assoc_iou=(face.iou if face.face_bbox is not None
+                           else None),
+                assoc_rejected=face.rejected,
             ))
 
         # 6) 审计（best-effort，不阻断响应）
@@ -299,7 +315,8 @@ def create_app(
 
         return LocateResponse(persons_found=len(persons),
                               persons=persons,
-                              faces_unmatched=faces_unmatched)
+                              faces_unmatched=faces_unmatched,
+                              assoc_rejected=assoc_rejected)
 
     return app
 

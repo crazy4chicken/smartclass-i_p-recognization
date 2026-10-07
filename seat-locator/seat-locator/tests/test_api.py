@@ -44,6 +44,10 @@ class FakeDetector:
         return self.script
 
 
+# P0 测试用的别名（与 FakeDetector 同实现）
+_FakeDet = FakeDetector
+
+
 def _png_bytes(w=640, h=480) -> bytes:
     import cv2
     import numpy as np
@@ -214,6 +218,69 @@ class TestLocate:
         # u-9999 的脸没有关联到任何 person 框 → 只计数
         assert body["faces_unmatched"] == 1
 
+        # P1a：关联可信度字段
+        assert p11["assoc_iou"] is not None and p11["assoc_iou"] > 0
+        assert p11["assoc_rejected"] is False
+        # p22：带脸但未识别（matched=False）→ assoc_iou 仍有值
+        assert p22["assoc_iou"] is not None and p22["assoc_iou"] > 0
+        # 无脸的 person（non_seated 走道者）→ assoc_iou null
+        assert non_seated[0]["assoc_iou"] is None
+        # P0：顶层拒配计数
+        assert body["assoc_rejected"] == 0
+
+    def test_locate_row_consistency_rejection(self, client):
+        """P0 端到端：后排脸落进前排框 → 拒配，身份清空但调试字段保留。"""
+        # 布局：3 排（row1 y=400 前 / row2 y=250 / row3 y=100 后），
+        # 排差 2 才会触发拒配（ROW_SLACK=1）
+        layout2 = {
+            "classroom_id": "rm-102",
+            "image_width": 640, "image_height": 480,
+            "rows": 3, "cols": 2,
+            "anchors": [
+                {"row": 1, "col": 1, "x": 150.0, "y": 400.0},
+                {"row": 1, "col": 2, "x": 450.0, "y": 400.0},
+                {"row": 2, "col": 1, "x": 150.0, "y": 250.0},
+                {"row": 2, "col": 2, "x": 450.0, "y": 250.0},
+                {"row": 3, "col": 1, "x": 150.0, "y": 100.0},
+                {"row": 3, "col": 2, "x": 450.0, "y": 100.0},
+            ],
+        }
+        from app.detector import Detection as _Det
+        from app.faceclient import FaceResult as _FR, StubFaceClient as _Stub
+
+        # 前排人：高框（透视拉到 y=100），脚点 (150,400) → row1
+        front = _Det(bbox=(50, 100, 250, 400), confidence=0.9,
+                     foot_point=(150.0, 400.0))
+        from app.api import create_app as _create
+        # 复用 client 的 PG（同库不同教室 id 即可）
+        r = client.put("/api/v1/classrooms/rm-102/layout", json=layout2)
+        assert r.status_code == 201, r.text
+
+        # 换检测器/脸桩：直接操作 app.state（TestClient 持有的 app）
+        app = client.app
+        app.state.detector = _FakeDet([front])
+        app.state.face_client = _Stub([
+            _FR(bbox=(135, 115, 165, 145), matched=True,
+                user_id="u-back", similarity=0.8, det_score=0.9),
+        ])
+        r = client.post("/api/v1/locate", json={
+            "image_url": "https://files.example.com/photo/1?expires=x",
+            "classroom_id": "rm-102",
+        })
+        assert r.status_code == 200, r.text
+        body = r.json()
+        assert body["persons_found"] == 1
+        p = body["persons"][0]
+        # 脸中心 y=130 → 隐含 row3，脚点 row1，差 2 > 1 → 拒配
+        assert p["row"] == 1 and p["col"] == 1
+        assert p["user_id"] is None
+        assert p["matched"] is False
+        assert p["assoc_rejected"] is True
+        assert p["face_bbox"] == [135.0, 115.0, 165.0, 145.0]  # 调试保留
+        assert body["assoc_rejected"] == 1
+        # 拒配不算 faces_unmatched（它挂上了，是被否决）
+        assert body["faces_unmatched"] == 0
+
     def test_locate_unknown_classroom_404(self, client):
         r = client.post("/api/v1/locate", json={
             "image_url": "https://files.example.com/p/1",
@@ -230,7 +297,7 @@ class TestLocate:
         })
         assert r.status_code == 200
         assert r.json() == {"persons_found": 0, "persons": [],
-                            "faces_unmatched": 0}
+                            "faces_unmatched": 0, "assoc_rejected": 0}
 
     def test_locate_image_fetch_fail_502(self, client):
         client.put("/api/v1/classrooms/rm-101/layout", json=LAYOUT)

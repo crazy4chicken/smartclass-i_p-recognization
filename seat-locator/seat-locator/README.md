@@ -9,11 +9,17 @@ POST /api/v1/locate {"image_url": "...", "classroom_id": "rm-101"}
 → {"persons_found": 32, "persons": [
      {"user_id": "u-1001", "matched": true, "similarity": 0.71,
       "row": 3, "col": 5, "status": "seated",
-      "bbox": [...], "face_bbox": [...]},
+      "bbox": [...], "face_bbox": [...],
+      "assoc_iou": 0.42, "assoc_rejected": false},
      {"user_id": null, "matched": false, "row": null, "col": null,
-      "status": "non_seated", "bbox": [...], "face_bbox": null}],
-   "faces_unmatched": 1}
+      "status": "non_seated", "bbox": [...], "face_bbox": null,
+      "assoc_iou": null, "assoc_rejected": false}],
+   "faces_unmatched": 1, "assoc_rejected": 0}
 ```
+
+`assoc_iou` = 脸↔人体框关联的 IoU（可信度）；`assoc_rejected` = 被**行一致性校验**
+拒配（脸的隐含排与脚点排差 > 1 → 疑似透视遮挡串座，身份清空、调试字段保留），
+防"后排学生的脸落进前排大框"导致的前排人被安上后排身份。
 
 ## 架构
 
